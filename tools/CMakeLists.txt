@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES(
   ${ZLIB_INCLUDE}
   ${FASTAHACK_INCLUDE}
   ${CXXOPTS_INCLUDE}
+  ${PROJECT_SOURCE_DIR}/core
 )
 
 
@@ -19,7 +20,7 @@ endif()
 
 #set(CMAKE_BUILD_TYPE Debug) # uncomment this when you need a debug build
 
-add_executable(graphite
+add_executable(cvm
   ${CVM_TOOLS_SOURCES}
 )
 
@@ -29,4 +30,4 @@ target_link_libraries(cvm
 )
 
 add_dependencies(cvm ${CVM_EXTERNAL_PROJECT})
-install(TARGETS cvm DESTINATION bin)
+#install(TARGETS cvm DESTINATION bin)
