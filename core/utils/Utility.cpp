@@ -1,9 +1,10 @@
-#pragma once
+#include "Utility.h"
 
 #include <string>
 #include <iostream>
 #include <memory>
 #include <fstream>
+#include <vector>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -67,5 +68,12 @@ namespace cvm
 	{
 		auto iter = path.find_last_of(ending);
 		return (iter != path.size() - ending.size());
+	}
+
+	bool isNumber(const std::string& s)
+	{
+		std::string::const_iterator it = s.begin();
+		while (it != s.end() && std::isdigit(*it)) ++it;
+		return !s.empty() && it == s.end();
 	}
 }

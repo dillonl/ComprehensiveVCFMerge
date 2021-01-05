@@ -1,5 +1,5 @@
 #include "Params.h"
-#include "Utility.hpp"
+#include "Utility.h"
 
 namespace cvm
 {
@@ -19,7 +19,7 @@ namespace cvm
 			("s,silent", "Run without reports")
 			("r,reference", "Path to input reference (FASTA) file [required]", cxxopts::value< std::string >())
 			("v,vcfs", "Path to input VCF files, separate multiple files by space [required]", cxxopts::value< std::vector< std::string > >())
-		    ("n,names", "Name for VCF files, separate multiple names by space [required]", cxxopts::value< std::vector< std::string > >())
+		    ("l,labels", "Labels for VCF files, separate multiple labels by space [required]", cxxopts::value< std::vector< std::string > >())
 			("o,output_vcf", "Output VCF file name [required]", cxxopts::value< std::string >());
 		this->m_options.parse(argc, argv);
 	}
@@ -28,14 +28,14 @@ namespace cvm
 	{
 		std::vector< std::string > errorMessages;
 		auto vcfCount = m_options.count("v");
-		auto nameCount = m_options.count("n");
-		if (vcfCount <= 1 || nameCount <= 1)
+		auto labelCount = m_options.count("l");
+		if (vcfCount <= 1 || labelCount <= 1)
 		{
-			errorMessages.emplace_back("You must provide at least 2 vcfs and names");
+			errorMessages.emplace_back("You must provide at least 2 vcfs and labels");
 		}
-		if (vcfCount != nameCount)
+		if (vcfCount != labelCount)
 		{
-			errorMessages.emplace_back("Please provide a name for every vcf");
+			errorMessages.emplace_back("Please provide a label for every vcf");
 		}
 		return errorMessages;
 	}
@@ -62,16 +62,19 @@ namespace cvm
 		return vcfPaths;
 	}
 
-	std::vector< std::string > Params::getInVCFNames()
+	std::vector< std::string > Params::getInVCFLabels()
 	{
-		auto vcfNames =  m_options["n"].as< std::vector< std::string > >();
-		return vcfNames;
+		return m_options["l"].as< std::vector< std::string > >();
+	}
+
+	std::string Params::getReferencePath()
+	{
+		return m_options["r"].as< std::string >();
 	}
 
 	std::string Params::getOutVCFPath()
 	{
-		auto vcfName =  m_options["o"].as< std::string >();
-		return vcfName;
+		return m_options["o"].as< std::string >();
 	}
 
 	void Params::validateFilePaths(const std::vector< std::string >& paths, bool exitOnFailure)

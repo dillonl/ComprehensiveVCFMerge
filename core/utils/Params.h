@@ -20,8 +20,9 @@ namespace cvm
 
 		void validateFilePaths(const std::vector< std::string >& paths, bool exitOnFailure);
 		std::vector< std::string > getInVCFPaths();
-		std::vector< std::string > getInVCFNames();
+		std::vector< std::string > getInVCFLabels();
 		std::string getOutVCFPath();
+		std::string getReferencePath();
 		std::string getHelpMessage();
 
 	private:

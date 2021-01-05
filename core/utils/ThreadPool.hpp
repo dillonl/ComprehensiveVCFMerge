@@ -16,14 +16,22 @@ namespace cvm
 	class ThreadPool
 	{
 	public:
-		ThreadPool(size_t);
+		static ThreadPool* Instance()
+		{
+			static ThreadPool* s_instance = NULL; // this is only created/initialized once the first time this function is called. After that it's ignored
+			if (s_instance == NULL)
+			{
+				s_instance = new ThreadPool(std::thread::hardware_concurrency());
+			}
+			return s_instance;
+		}
 		template<class F, class... Args>
-		auto enqueue(F&& f, Args&&... args)
-			-> std::future<typename std::result_of<F(Args...)>::type>;
-		~ThreadPool();
+		auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
 
 		void join();
 	private:
+		ThreadPool(size_t n_threads);
+		~ThreadPool();
 		// need to keep track of threads so we can join them
 		std::vector< std::thread > workers;
 		// the task queue
@@ -50,8 +58,7 @@ namespace cvm
 
 						{
 							std::unique_lock<std::mutex> lock(this->queue_mutex);
-							this->condition.wait(lock,
-												 [this]{ return this->stop || !this->tasks.empty(); });
+							this->condition.wait(lock, [this]{ return this->stop || !this->tasks.empty(); });
 							if(this->stop && this->tasks.empty())
 								return;
 							task = std::move(this->tasks.front());
@@ -82,10 +89,24 @@ namespace cvm
 
 	inline void ThreadPool::join()
 	{
+		/*
 		while (m_running_processes > 0)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
+		*/
+		std::cout << "starting join" << std::endl;
+		{
+			std::unique_lock<std::mutex> lock(queue_mutex);
+			stop = true;
+		}
+		condition.notify_all();
+		for(std::thread &worker: workers)
+		{
+			worker.join();
+		}
+		workers.clear();
+		std::cout << "ending join" << std::endl;
 		/*
 		{
 			std::unique_lock<std::mutex> lock(queue_mutex);

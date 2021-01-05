@@ -1,0 +1,26 @@
+SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+
+# Setting up external library for TABIX
+SET(TABIX_PROJECT tabix_project CACHE INTERNAL "tabix project name")
+SET(TABIX_DIR ${CMAKE_BINARY_DIR}/externals/tabix CACHE INTERNAL "tabix project directory")
+ExternalProject_Add(${TABIX_PROJECT}
+	GIT_REPOSITORY https://github.com/dillonl/tabix.git
+    GIT_TAG e12b75b88e3ff9e098a07976c3b1062b1f3182f4
+    DEPENDS ${ZLIB_PROJECT}
+    INSTALL_COMMAND ""
+    UPDATE_COMMAND ""
+    PREFIX ${TABIX_DIR}
+    CMAKE_CACHE_ARGS
+        -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+        -DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
+        -DZLIB_INCLUDE:PATH=${ZLIB_INCLUDE}
+)
+
+
+ExternalProject_Get_Property(${TABIX_PROJECT} INSTALL_DIR)
+ExternalProject_Get_Property(${TABIX_PROJECT} SOURCE_DIR)
+ExternalProject_Get_Property(${TABIX_PROJECT} BINARY_DIR)
+
+SET(TABIX_LIB ${BINARY_DIR}/libtabix.a CACHE INTERNAL "TABIX Library")
+SET(TABIX_INCLUDE ${SOURCE_DIR} CACHE INTERNAL "TABIX Include")
